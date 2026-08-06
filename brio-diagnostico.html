@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico de Vida · Brio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
+
+:root {
+  --bg: #f5f2ed;
+  --surface: #ffffff;
+  --ink: #1c1917;
+  --muted: #78716c;
+  --faint: #e8e3dc;
+  --accent: #a8522a;
+  --accent-soft: rgba(168,82,42,0.10);
+  --bot-bg: #ffffff;
+  --user-bg: #1c1917;
+  --user-text: #f5f2ed;
+  --radius: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── TELA DE INTRO ── */
+#intro-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  gap: 32px;
+}
+
+.brio-mark {
+  font-family: 'Fraunces', serif;
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.intro-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(32px, 6vw, 52px);
+  font-weight: 300;
+  line-height: 1.1;
+  color: var(--ink);
+  max-width: 520px;
+}
+
+.intro-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.intro-body {
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--muted);
+  max-width: 400px;
+  line-height: 1.7;
+}
+
+.intro-meta {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.meta-chip {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+  background: var(--faint);
+  padding: 6px 14px;
+  border-radius: 100px;
+}
+
+.btn-start {
+  background: var(--ink);
+  color: var(--bg);
+  border: none;
+  border-radius: 100px;
+  padding: 16px 40px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  letter-spacing: 0.01em;
+}
+.btn-start:hover { background: var(--accent); transform: translateY(-1px); }
+
+/* ── TELA DE NOME ── */
+#name-screen {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  gap: 28px;
+}
+
+.name-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 300;
+  color: var(--ink);
+}
+
+.name-input-wrap {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.name-input {
+  flex: 1;
+  border: 1.5px solid var(--faint);
+  border-radius: 100px;
+  padding: 14px 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  background: var(--surface);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.name-input:focus { border-color: var(--accent); }
+
+.btn-go {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 100px;
+  padding: 14px 24px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+.btn-go:hover { opacity: 0.85; }
+
+/* ── TELA DE CHAT ── */
+#chat-screen {
+  display: none;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Header */
+.chat-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--faint);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.chat-brand {
+  font-family: 'Fraunces', serif;
+  font-size: 15px;
+  font-weight: 300;
+  letter-spacing: 0.10em;
+  color: var(--accent);
+}
+
+.progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.progress-bar-bg {
+  width: 80px;
+  height: 3px;
+  background: var(--faint);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Messages */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  scroll-behavior: smooth;
+}
+
+.msg {
+  display: flex;
+  gap: 10px;
+  max-width: 90%;
+  animation: msgIn 0.25s ease;
+}
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.msg.bot { align-self: flex-start; flex-direction: row; }
+.msg.user { align-self: flex-end; flex-direction: row-reverse; }
+
+.msg-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: 'Fraunces', serif;
+  font-size: 13px;
+  color: var(--accent);
+  font-style: italic;
+}
+
+.msg-bubble {
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  line-height: 1.65;
+  font-size: 14.5px;
+  font-weight: 300;
+}
+
+.msg.bot .msg-bubble {
+  background: var(--surface);
+  color: var(--ink);
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.msg.user .msg-bubble {
+  background: var(--user-bg);
+  color: var(--user-text);
+  border-bottom-right-radius: 4px;
+}
+
+/* Typing indicator */
+.typing-indicator {
+  display: none;
+  align-self: flex-start;
+  padding: 14px 18px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.typing-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.typing-dots span {
+  width: 7px;
+  height: 7px;
+  background: var(--muted);
+  border-radius: 50%;
+  animation: bounce 1.2s infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+/* Input */
+.chat-input-area {
+  padding: 16px 24px 24px;
+  border-top: 1px solid var(--faint);
+  background: var(--bg);
+}
+
+.input-wrap {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.chat-input {
+  flex: 1;
+  border: 1.5px solid var(--faint);
+  border-radius: 24px;
+  padding: 13px 18px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14.5px;
+  font-weight: 300;
+  background: var(--surface);
+  color: var(--ink);
+  outline: none;
+  resize: none;
+  max-height: 120px;
+  line-height: 1.5;
+  transition: border-color 0.2s;
+}
+.chat-input:focus { border-color: var(--accent); }
+
+.send-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--ink);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s, transform 0.15s;
+}
+.send-btn:hover { background: var(--accent); transform: scale(1.05); }
+.send-btn svg { stroke: white; }
+
+/* ── TELA DE RESULTADO ── */
+#result-screen {
+  display: none;
+  flex-direction: column;
+  padding: 48px 24px 80px;
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+  gap: 40px;
+}
+
+.result-header {}
+
+.result-eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.result-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 300;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.result-title em { font-style: italic; color: var(--accent); }
+
+.result-name-line {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 8px;
+  font-weight: 300;
+}
+
+/* Grid resultado */
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+@media (max-width: 580px) {
+  .result-grid { grid-template-columns: 1fr; }
+}
+
+/* Roda */
+#result-svg {
+  width: 100%;
+  max-width: 320px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Cards de área */
+.result-areas { display: flex; flex-direction: column; gap: 8px; }
+
+.r-card {
+  background: var(--surface);
+  border: 1px solid var(--faint);
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color 0.18s;
+}
+.r-card:hover, .r-card.open { border-color: var(--accent); background: #fdf8f6; }
+
+.r-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.r-num {
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 16px;
+  font-weight: 400;
+}
+
+.r-name {
+  font-size: 13px;
+  font-weight: 500;
+  flex: 1;
+}
+
+.r-score {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  color: var(--accent);
+}
+
+.r-bar-bg {
+  height: 3px;
+  background: var(--faint);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.r-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.r-detail {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 300;
+  line-height: 1.6;
+}
+.r-card.open .r-detail { max-height: 160px; padding-top: 10px; }
+
+/* Summary stats */
+.result-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding-top: 32px;
+  border-top: 1px solid var(--faint);
+}
+
+@media (max-width: 500px) {
+  .result-stats { grid-template-columns: 1fr; }
+}
+
+.stat-block {}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.stat-val {
+  font-family: 'Fraunces', serif;
+  font-size: 36px;
+  font-weight: 300;
+  color: var(--ink);
+}
+
+.stat-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+/* Insight box */
+.insight-box {
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: 16px;
+  padding: 28px 32px;
+}
+
+.insight-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.insight-text {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(17px, 3vw, 22px);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.5;
+  color: #f5f2ed;
+}
+
+.footnote-r {
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.5;
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ INTRO ══════════ -->
+<div id="intro-screen">
+  <p class="brio-mark">Brio</p>
+  <h1 class="intro-title">Onde você está,<br><em>de verdade.</em></h1>
+  <p class="intro-body">Uma conversa honesta sobre as 10 áreas da sua vida — sem formulário, sem escalas de 1 a 10. Só perguntas que valem a pena responder.</p>
+  <div class="intro-meta">
+    <span class="meta-chip">⏱ ~15 minutos</span>
+    <span class="meta-chip">10 áreas da vida</span>
+    <span class="meta-chip">Diagnóstico gerado ao final</span>
+  </div>
+  <button class="btn-start" onclick="goToName()">Começar diagnóstico →</button>
+</div>
+
+<!-- ══════════ NOME ══════════ -->
+<div id="name-screen">
+  <p class="brio-mark">Brio</p>
+  <h2 class="name-title">Como posso te chamar?</h2>
+  <div class="name-input-wrap">
+    <input class="name-input" id="name-input" type="text" placeholder="Seu primeiro nome" autofocus
+      onkeydown="if(event.key==='Enter') startChat()" />
+    <button class="btn-go" onclick="startChat()">→</button>
+  </div>
+</div>
+
+<!-- ══════════ CHAT ══════════ -->
+<div id="chat-screen">
+  <div class="chat-header">
+    <span class="chat-brand">brio</span>
+    <div class="progress-wrap">
+      <span class="progress-label" id="progress-label">Iniciando</span>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-messages" id="chat-messages">
+    <div class="typing-indicator" id="typing">
+      <div class="typing-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-input-area">
+    <div class="input-wrap">
+      <textarea class="chat-input" id="chat-input" rows="1"
+        placeholder="Escreva aqui…"
+        onkeydown="handleKey(event)"
+        oninput="autoResize(this)"></textarea>
+      <button class="send-btn" onclick="sendMessage()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ RESULTADO ══════════ -->
+<div id="result-screen">
+  <div class="result-header">
+    <p class="result-eyebrow">Diagnóstico Brio</p>
+    <h2 class="result-title">O mapa da sua<br><em>vida agora.</em></h2>
+    <p class="result-name-line" id="result-name-line"></p>
+  </div>
+
+  <div class="result-grid">
+    <div>
+      <svg id="result-svg" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div class="result-areas" id="result-areas"></div>
+  </div>
+
+  <div class="result-stats">
+    <div class="stat-block">
+      <div class="stat-label">Média geral</div>
+      <div class="stat-val" id="stat-avg">–</div>
+      <div class="stat-note" id="stat-avg-note">–</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-label">Pede atenção</div>
+      <div class="stat-val" id="stat-low">–</div>
+      <div class="stat-note" id="stat-low-note">–</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-label">Maior alavanca</div>
+      <div class="stat-val" id="stat-lever">–</div>
+      <div class="stat-note" id="stat-lever-note">–</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">Síntese do diagnóstico</div>
+    <p class="insight-text" id="insight-text">Carregando…</p>
+  </div>
+
+  <p class="footnote-r">Diagnóstico gerado por IA com base nas suas respostas. Não substitui acompanhamento profissional — é o ponto de partida para uma conversa mais profunda.</p>
+</div>
+
+<script>
+// ══════════ ESTADO ══════════
+let userName = '';
+let conversationHistory = [];
+let diagnosisData = null;
+let isWaiting = false;
+
+const AREAS = [
+  "Saúde e corpo",
+  "Saúde mental e processamento",
+  "Relacionamento amoroso",
+  "Parentalidade / família próxima",
+  "Carreira / negócio principal",
+  "Projeto profissional secundário ou propósito",
+  "Casa e ambiente de vida",
+  "Desenvolvimento pessoal",
+  "Vida social e comunidade",
+  "Família de origem"
+];
+
+// ══════════ SYSTEM PROMPT ══════════
+function buildSystemPrompt(name) {
+  return `Você é o assistente de diagnóstico da Brio, uma consultoria de Arquitetura de Vida. Seu papel é conduzir uma conversa de diagnóstico com ${name} sobre as 10 áreas da Roda da Vida.
+
+TOM: Curioso, levemente desafiador, humano. Não é terapeuta nem coach suave — é alguém que faz perguntas que a pessoa não se faz sozinha. Direto, sem floreio. Usa o nome da pessoa às vezes, não sempre. Frases curtas. Zero jargão de autoajuda.
+
+AS 10 ÁREAS para explorar (nesta ordem):
+${AREAS.map((a,i)=>`${i+1}. ${a}`).join('\n')}
+
+COMO CONDUZIR:
+- Explore UMA área por vez. Faça 1-2 perguntas por área. Se a resposta for vaga, aprofunde uma vez só (não interrogue).
+- Perguntas abertas, não "de 0 a 10". Ex: "O que está funcionando? O que está claramente faltando?" ou "Se eu te perguntar daqui a um ano se melhorou, o que você me responderia?"
+- Quando sentir que captou o suficiente da área, avance naturalmente para a próxima.
+- Progresso: mencione discretamente quando estiver passando de área ("Ok, mudando um pouco o foco…")
+- Ao completar as 10 áreas, avise que vai gerar o diagnóstico e encerre a conversa com uma frase.
+
+GERAÇÃO DO DIAGNÓSTICO:
+Quando todas as 10 áreas forem exploradas, gere um JSON de diagnóstico EXATO assim. CRÍTICO: retorne APENAS o JSON puro, sem bloco de código, sem ```json, sem nenhum texto antes ou depois do JSON:
+
+{
+  "areas": [
+    {"nome": "Saúde e corpo", "nota": 6, "diagnostico": "frase curta de diagnóstico", "proximo": "próximo passo concreto"},
+    ... (10 áreas)
+  ],
+  "insight": "Frase de síntese poderosa sobre o padrão geral que você viu — máximo 2 frases, estilo coach direto",
+  "alavanca": "Nome da área que, se melhorada, mais impacta o conjunto",
+  "alavanca_razao": "Por que essa área é a alavanca — uma frase"
+}
+
+IMPORTANTE: Só gere o JSON quando tiver explorado TODAS as 10 áreas. Antes disso, continue conversando normalmente.`;
+}
+
+// ══════════ NAVEGAÇÃO ══════════
+function goToName() {
+  document.getElementById('intro-screen').style.display = 'none';
+  const ns = document.getElementById('name-screen');
+  ns.style.display = 'flex';
+  setTimeout(() => document.getElementById('name-input').focus(), 100);
+}
+
+function startChat() {
+  const input = document.getElementById('name-input');
+  userName = input.value.trim() || 'você';
+  document.getElementById('name-screen').style.display = 'none';
+  const cs = document.getElementById('chat-screen');
+  cs.style.display = 'flex';
+  conversationHistory = [];
+  sendFirstMessage();
+}
+
+// ══════════ CHAT ══════════
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function scrollBottom() {
+  const msgs = document.getElementById('chat-messages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const t = document.getElementById('typing');
+  t.style.display = 'block';
+  scrollBottom();
+}
+
+function hideTyping() {
+  document.getElementById('typing').style.display = 'none';
+}
+
+function addMessage(role, text) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+
+  if (role === 'bot') {
+    div.innerHTML = `
+      <div class="msg-avatar">b</div>
+      <div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  } else {
+    div.innerHTML = `
+      <div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div>
+      <div class="msg-avatar" style="background:#1c1917;color:#f5f2ed;font-family:Inter,sans-serif;font-size:12px;font-style:normal;">${userName.charAt(0).toUpperCase()}</div>`;
+  }
+
+  msgs.insertBefore(div, document.getElementById('typing'));
+  scrollBottom();
+}
+
+async function sendFirstMessage() {
+  showTyping();
+  const reply = await callClaude([]);
+  hideTyping();
+  if (reply) {
+    addMessage('bot', reply);
+    conversationHistory.push({role:'assistant', content: reply});
+  }
+}
+
+async function sendMessage() {
+  if (isWaiting) return;
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  addMessage('user', text);
+  conversationHistory.push({role:'user', content: text});
+
+  isWaiting = true;
+  showTyping();
+
+  // Estimar progresso
+  updateProgress();
+
+  const reply = await callClaude(conversationHistory);
+  hideTyping();
+  isWaiting = false;
+
+  if (!reply) return;
+
+  // Checar se é JSON de diagnóstico — suporta com ou sem bloco markdown
+  const stripped = reply.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+  const jsonMatch = stripped.match(/\{[\s\S]*"areas"[\s\S]*\}/);
+  if (jsonMatch) {
+    try {
+      diagnosisData = JSON.parse(jsonMatch[0]);
+      addMessage('bot', 'Pronto. Seu diagnóstico está gerado. ✦');
+      conversationHistory.push({role:'assistant', content: reply});
+      setTimeout(() => showResult(), 1200);
+      return;
+    } catch(e) {
+      console.error('Erro ao parsear JSON:', e, jsonMatch[0]);
+    }
+  }
+
+  addMessage('bot', reply);
+  conversationHistory.push({role:'assistant', content: reply});
+}
+
+async function callClaude(history) {
+  const messages = history.length === 0
+    ? [{role:'user', content: `Olá, meu nome é ${userName}. Pode começar o diagnóstico.`}]
+    : history;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: buildSystemPrompt(userName),
+        messages: messages
+      })
+    });
+    const data = await res.json();
+    if (data.content && data.content[0]) return data.content[0].text;
+    return null;
+  } catch(e) {
+    return 'Ops, tive um problema técnico. Pode tentar de novo?';
+  }
+}
+
+function updateProgress() {
+  const total = conversationHistory.length;
+  // ~2 mensagens por área, 10 áreas = ~20 pares
+  const pct = Math.min(Math.round((total / 22) * 100), 95);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  const area = Math.min(Math.ceil(total / 2.2), 10);
+  document.getElementById('progress-label').textContent = `Área ${area} de 10`;
+}
+
+// ══════════ RESULTADO ══════════
+function showResult() {
+  document.getElementById('chat-screen').style.display = 'none';
+  const rs = document.getElementById('result-screen');
+  rs.style.display = 'flex';
+
+  if (!diagnosisData) return;
+
+  const { areas, insight, alavanca, alavanca_razao } = diagnosisData;
+
+  document.getElementById('result-name-line').textContent =
+    `Diagnóstico de ${userName} · ${new Date().toLocaleDateString('pt-BR',{month:'long', year:'numeric'})}`;
+
+  // Roda
+  drawWheel(areas);
+
+  // Cards
+  const container = document.getElementById('result-areas');
+  container.innerHTML = '';
+  areas.forEach((a,i) => {
+    const card = document.createElement('div');
+    card.className = 'r-card';
+    card.innerHTML = `
+      <div class="r-card-top">
+        <span class="r-num">${i+1}</span>
+        <span class="r-name">${a.nome}</span>
+        <span class="r-score">${a.nota}</span>
+      </div>
+      <div class="r-bar-bg">
+        <div class="r-bar-fill" style="width:${a.nota*10}%"></div>
+      </div>
+      <div class="r-detail">
+        <strong style="color:#1c1917;font-weight:500">Diagnóstico:</strong> ${a.diagnostico}<br><br>
+        <strong style="color:#1c1917;font-weight:500">Próximo passo:</strong> ${a.proximo}
+      </div>`;
+    card.addEventListener('click', () => {
+      card.classList.toggle('open');
+    });
+    container.appendChild(card);
+  });
+
+  // Stats
+  const notas = areas.map(a=>a.nota);
+  const avg = (notas.reduce((s,n)=>s+n,0)/notas.length).toFixed(1);
+  const minNota = Math.min(...notas);
+  const minArea = areas.find(a=>a.nota===minNota);
+
+  document.getElementById('stat-avg').textContent = avg;
+  document.getElementById('stat-avg-note').textContent =
+    avg < 5 ? 'Modo sobreviver ativo' : avg < 7 ? 'Equilíbrio em construção' : 'Base sólida';
+
+  document.getElementById('stat-low').textContent = minNota;
+  document.getElementById('stat-low-note').textContent = minArea.nome;
+
+  document.getElementById('stat-lever').textContent = '↑';
+  document.getElementById('stat-lever-note').textContent = alavanca + ' — ' + alavanca_razao;
+
+  document.getElementById('insight-text').textContent = insight;
+}
+
+function drawWheel(areas) {
+  const svg = document.getElementById('result-svg');
+  svg.innerHTML = '';
+  const cx=160, cy=160, R=130, N=areas.length;
+  const step = (2*Math.PI)/N;
+  const start = -Math.PI/2;
+
+  // Rings
+  [2,4,6,8,10].forEach(v=>{
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',cx); c.setAttribute('cy',cy);
+    c.setAttribute('r',(v/10)*R);
+    c.setAttribute('fill','none');
+    c.setAttribute('stroke','#e8e3dc');
+    c.setAttribute('stroke-width','1');
+    svg.appendChild(c);
+  });
+
+  // Spokes
+  areas.forEach((_,i)=>{
+    const a=start+i*step;
+    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',cx); l.setAttribute('y1',cy);
+    l.setAttribute('x2',cx+R*Math.cos(a));
+    l.setAttribute('y2',cy+R*Math.sin(a));
+    l.setAttribute('stroke','#e8e3dc'); l.setAttribute('stroke-width','1');
+    svg.appendChild(l);
+  });
+
+  // Polygon
+  const pts = areas.map((a,i)=>{
+    const ang=start+i*step;
+    const d=(a.nota/10)*R;
+    return `${cx+d*Math.cos(ang)},${cy+d*Math.sin(ang)}`;
+  }).join(' ');
+
+  const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  poly.setAttribute('points',pts);
+  poly.setAttribute('fill','rgba(168,82,42,0.15)');
+  poly.setAttribute('stroke','#a8522a');
+  poly.setAttribute('stroke-width','2');
+  poly.setAttribute('stroke-linejoin','round');
+  svg.appendChild(poly);
+
+  // Dots + numbers
+  areas.forEach((a,i)=>{
+    const ang=start+i*step;
+    const d=(a.nota/10)*R;
+    const x=cx+d*Math.cos(ang), y=cy+d*Math.sin(ang);
+    const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('cx',x); dot.setAttribute('cy',y);
+    dot.setAttribute('r','5');
+    dot.setAttribute('fill','#a8522a');
+    dot.setAttribute('stroke','white'); dot.setAttribute('stroke-width','2');
+    svg.appendChild(dot);
+
+    const lr=R+16;
+    const lx=cx+lr*Math.cos(ang), ly=cy+lr*Math.sin(ang);
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',lx); t.setAttribute('y',ly);
+    t.setAttribute('text-anchor','middle');
+    t.setAttribute('dominant-baseline','middle');
+    t.setAttribute('font-size','9');
+    t.setAttribute('font-family','Inter, sans-serif');
+    t.setAttribute('fill','#78716c');
+    t.textContent = i+1;
+    svg.appendChild(t);
+  });
+}
+</script>
+</body>
+</html>
