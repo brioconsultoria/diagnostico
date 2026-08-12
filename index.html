@@ -186,16 +186,18 @@ var isRecording = false;
 var STORAGE_KEY = 'brio_chat_v2';
 
 var AREAS = [
-  "Saude e corpo",
-  "Saude mental e processamento",
-  "Relacionamento amoroso",
-  "Parentalidade e familia proxima",
-  "Carreira e negocio principal",
-  "Projeto profissional secundario ou proposito",
-  "Casa e ambiente de vida",
-  "Desenvolvimento pessoal",
-  "Vida social e comunidade",
-  "Familia de origem"
+  "Clareza e foco",
+  "Gestao do tempo e energia",
+  "Equilibrio emocional",
+  "Autoconhecimento",
+  "Relacao com dinheiro",
+  "Gestao e controle financeiro",
+  "Abundancia e expansao",
+  "Saude e disposicao",
+  "Desenvolvimento e aprendizado",
+  "Familia e vinculos proximos",
+  "Vida social e rede de apoio",
+  "Qualidade de vida"
 ];
 
 function saveState() {
@@ -224,8 +226,7 @@ function loadState() {
 }
 
 function buildPrompt(name) {
-  var list = AREAS.map(function(a,i){ return (i+1)+'. '+a; }).join('\n');
-  return 'Voce e o assistente de diagnostico da Brio, consultoria de Arquitetura de Vida. Conduza conversa de diagnostico com '+name+' sobre 10 areas da Roda da Vida.\n\nTOM: Curioso, levemente desafiador, humano. Direto, sem floreio. Frases curtas. Zero jargao. Usa o nome as vezes.\n\nAS 10 AREAS:\n'+list+'\n\nCOMO CONDUZIR:\n- Uma area por vez. 1-2 perguntas. Se vago, aprofunde uma vez so.\n- Perguntas abertas. Ex: O que esta funcionando? O que claramente falta?\n- Avance naturalmente entre areas.\n- Ao completar 10 areas, avise que vai gerar diagnostico.\n\nGERASAO DO DIAGNOSTICO:\nApos TODAS as 10 areas, retorne APENAS JSON puro sem markdown:\n\n{"areas":[{"nome":"Saude e corpo","nota":6,"diagnostico":"texto","proximo":"texto"}],"insight":"sintese em 2 frases","alavanca":"area","alavanca_razao":"razao"}\n\nCRITICO: so o JSON, sem texto antes ou depois.';
+  return 'Voce e o assistente de diagnostico da Brio, consultoria de Arquitetura de Vida. Conduza uma conversa de diagnostico com '+name+' sobre 12 areas organizadas em 5 pilares.\n\nTOM: Curioso, levemente desafiador, humano. Direto, sem floreio. Frases curtas. Zero jargao de autoajuda. Usa o nome as vezes, nao sempre.\n\nOS 5 PILARES E 12 AREAS:\n\nPILAR 1 - MENTALIDADE E GESTAO DE SI (aprofundado):\n1. Clareza e foco\n2. Gestao do tempo e energia\n3. Equilibrio emocional\n4. Autoconhecimento\n\nPILAR 2 - COMPORTAMENTO FINANCEIRO (aprofundado):\n5. Relacao com dinheiro\n6. Gestao e controle financeiro\n7. Abundancia e expansao\n\nPILAR 3 - VIDA PESSOAL (enxuto):\n8. Saude e disposicao\n9. Desenvolvimento e aprendizado\n\nPILAR 4 - RELACIONAMENTOS (enxuto):\n10. Familia e vinculos proximos\n11. Vida social e rede de apoio\n\nPILAR 5 - QUALIDADE DE VIDA (enxuto):\n12. Qualidade de vida\n\nCOMO CONDUZIR:\n- Explore UMA area por vez, na ordem dos pilares.\n- Pilares 1 e 2 (aprofundados): faca 2-3 perguntas por area. Se a pessoa for vaga, faca UMA pergunta de ancoragem concreta antes de avancar. Ex: "Me da um exemplo de como isso aparece no seu dia a dia?" ou "O que seria diferente se isso estivesse resolvido?". Nao interrogue — aprofunde uma vez so. Ao fechar cada area, pergunte de forma natural: "Pensando em tudo que voce me contou sobre essa area... no dia a dia real, qual o nivel de satisfacao que voce tem — de 0 a 10, sendo 0 'precisa urgente de atencao' e 10 'estou muito bem aqui'?"\n- Pilares 3, 4 e 5 (enxutos): faca 1 pergunta por area. So aprofunde se a pessoa abrir algo significativo. Depois da resposta, emende naturalmente a pergunta de satisfacao: 'E de 0 a 10, qual o nivel de satisfacao com essa area hoje?'\n- AREA 5 (Relacao com dinheiro): preste atencao se o gap maior e em CRENCAS/EMOCOES (medo, culpa, bloqueios com dinheiro) ou em COMPORTAMENTOS PRATICOS (gastos, habitos, organizacao). Aprofunde no ponto onde o gap for maior.\n- AREA 10 (Familia): pergunte primeiro se a pessoa tem filhos. Se sim, explore parentalidade e familia de origem separadamente. Se nao, adapte para "familia que voce esta construindo ou escolheu construir".\n- Se a pessoa for vaga em qualquer area, faca uma pergunta de ancoragem antes de avancar. Ex: "Me da um exemplo concreto" ou "Como isso aparece no seu dia a dia?".\n- Mencione discretamente quando estiver mudando de pilar. Ex: "Agora vamos para um tema central da Brio..."\n- Ao completar as 12 areas, faca a PERGUNTA DE ENCERRAMENTO antes de gerar o diagnostico.\n\nPERGUNTA DE ENCERRAMENTO:\nAntes de gerar o diagnostico, pergunte: "Pensando em tudo que voce respondeu aqui — qual e o seu maior desafio hoje? A dor que voce mais quer resolver agora?" Registre a resposta como campo "dor_principal" no JSON.\n\nGERASAO DO DIAGNOSTICO:\nApos as 12 areas E a pergunta de encerramento, retorne APENAS JSON puro sem markdown:\n\n{"areas":[{"nome":"Clareza e foco","nota":6,"nota_cliente":7,"diagnostico":"texto","proximo":"texto"}],"insight":"sintese poderosa em 2 frases","alavanca":"area","alavanca_razao":"razao","dor_principal":"o que o cliente disse ser sua maior dor"}\n\nCRITICO: so o JSON puro, sem texto antes ou depois, sem backticks.';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -356,7 +357,7 @@ async function callClaude(messages) {
 function updateProgress() {
   var total = conversationHistory.length;
   document.getElementById('progress-fill').style.width = Math.min(Math.round((total/22)*100),95)+'%';
-  document.getElementById('progress-label').textContent = 'Area '+Math.min(Math.ceil(total/2.2),10)+' de 10';
+  document.getElementById('progress-label').textContent = 'Area '+Math.min(Math.ceil(total/2.4),12)+' de 12';
 }
 
 function toggleMic() {
@@ -396,7 +397,14 @@ function showResult() {
   var c=document.getElementById('result-areas'); c.innerHTML='';
   areas.forEach(function(a,i){
     var card=document.createElement('div'); card.className='r-card';
-    card.innerHTML='<div class="r-card-top"><span class="r-num">'+(i+1)+'</span><span class="r-name">'+a.nome+'</span><span class="r-score">'+a.nota+'</span></div><div class="r-bar-bg"><div class="r-bar-fill" style="width:'+(a.nota*10)+'%"></div></div><div class="r-detail"><strong style="color:#1c1917;font-weight:500">Diagnostico:</strong> '+a.diagnostico+'<br><br><strong style="color:#1c1917;font-weight:500">Proximo passo:</strong> '+a.proximo+'</div>';
+    var gapHtml = '';
+    if (a.nota_cliente !== undefined) {
+      var gap = a.nota_cliente - a.nota;
+      var gapColor = gap > 2 ? '#A32D2D' : gap < -2 ? '#27500A' : '#78716c';
+      var gapText = gap > 0 ? '+'+gap+' vs IA' : gap < 0 ? gap+' vs IA' : 'igual a IA';
+      gapHtml = '<span style="font-size:10px;color:'+gapColor+';font-weight:500;margin-left:6px;">voce: '+a.nota_cliente+' ('+gapText+')</span>';
+    }
+    card.innerHTML='<div class="r-card-top"><span class="r-num">'+(i+1)+'</span><span class="r-name">'+a.nome+'</span><span class="r-score">'+a.nota+'</span></div>'+gapHtml+'<div class="r-bar-bg"><div class="r-bar-fill" style="width:'+(a.nota*10)+'%"></div></div><div class="r-detail"><strong style="color:#1c1917;font-weight:500">Diagnostico:</strong> '+a.diagnostico+'<br><br><strong style="color:#1c1917;font-weight:500">Proximo passo:</strong> '+a.proximo+'</div>';
     card.addEventListener('click',function(){ card.classList.toggle('open'); });
     c.appendChild(card);
   });
