@@ -364,7 +364,7 @@ function toggleMic() {
   recognition.interimResults = true;
   recognition.onstart = function(){ isRecording=true; document.getElementById('mic-btn').classList.add('recording'); document.getElementById('chat-input').placeholder='Ouvindo...'; };
   recognition.onresult = function(e){ document.getElementById('chat-input').value=Array.from(e.results).map(function(r){return r[0].transcript;}).join(''); autoResize(document.getElementById('chat-input')); };
-  recognition.onend = function(){ isRecording=false; document.getElementById('mic-btn').classList.remove('recording'); document.getElementById('chat-input').placeholder='Escreva ou fale...'; var t=document.getElementById('chat-input').value.trim(); if(t) sendMessage(); };
+  recognition.onend = function(){ isRecording=false; document.getElementById('mic-btn').classList.remove('recording'); document.getElementById('chat-input').placeholder='Escreva ou fale... (clique enviar quando terminar)'; };
   recognition.onerror = function(){ isRecording=false; document.getElementById('mic-btn').classList.remove('recording'); };
   recognition.start();
 }
