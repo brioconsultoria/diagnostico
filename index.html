@@ -14,11 +14,11 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:15px;color:va
 .brio-mark{font-family:'Fraunces',serif;font-size:13px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:var(--accent)}
 .intro-title{font-family:'Fraunces',serif;font-size:clamp(32px,6vw,52px);font-weight:300;line-height:1.1;color:var(--ink);max-width:520px}
 .intro-title em{font-style:italic;color:var(--accent)}
-.intro-body{font-size:15px;font-weight:300;color:var(--muted);max-width:400px;line-height:1.7}
-.intro-meta{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.intro-body{font-size:15px;font-weight:300;color:var(--muted);max-width:420px;line-height:1.7}
+.intro-meta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
 .meta-chip{font-size:12px;color:var(--muted);background:var(--faint);padding:6px 14px;border-radius:100px}
-.btn-start{background:var(--ink);color:var(--bg);border:none;border-radius:100px;padding:16px 40px;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:background .2s,transform .15s}
-.btn-start:hover{background:var(--accent);transform:translateY(-1px)}
+.btn-start{background:var(--ink);color:var(--bg);border:none;border-radius:100px;padding:16px 40px;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:background .2s}
+.btn-start:hover{background:var(--accent)}
 #name-screen{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;gap:28px}
 .name-title{font-family:'Fraunces',serif;font-size:clamp(24px,4vw,36px);font-weight:300;color:var(--ink)}
 .name-input-wrap{display:flex;gap:12px;width:100%;max-width:380px}
@@ -84,6 +84,8 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:15px;color:va
 .insight-box{background:var(--ink);color:var(--bg);border-radius:16px;padding:28px 32px}
 .insight-label{font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
 .insight-text{font-family:'Fraunces',serif;font-size:clamp(17px,3vw,22px);font-weight:300;font-style:italic;line-height:1.5;color:#f5f2ed}
+.dor-box{background:#fdf8f6;border-left:3px solid var(--accent);padding:14px 18px;font-size:13px;color:var(--ink);line-height:1.6}
+.dor-label{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
 .result-actions{display:flex;gap:12px;flex-wrap:wrap}
 .btn-pdf{background:var(--accent);color:#fff;border:none;border-radius:100px;padding:14px 28px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:opacity .2s}
 .btn-pdf:hover{opacity:.85}
@@ -91,17 +93,16 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:15px;color:va
 .footnote-r{font-size:12px;color:var(--muted);font-style:italic;font-weight:300;line-height:1.5}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script>emailjs.init("rvvPCjCaI5FpWYujk");</script>
 </head>
 <body>
 
 <div id="intro-screen">
   <p class="brio-mark">Brio</p>
   <h1 class="intro-title">Onde voce esta,<br><em>de verdade.</em></h1>
-  <p class="intro-body">Uma conversa honesta sobre as 10 areas da sua vida sem formulario, sem escalas. So perguntas que valem a pena responder.</p>
+  <p class="intro-body">Uma conversa honesta sobre 5 pilares e 12 areas da sua vida. Sem formulario, sem escalas — so perguntas que valem a pena responder.</p>
   <div class="intro-meta">
-    <span class="meta-chip">15 minutos</span>
-    <span class="meta-chip">10 areas da vida</span>
+    <span class="meta-chip">~20 minutos</span>
+    <span class="meta-chip">5 pilares · 12 areas</span>
     <span class="meta-chip">Diagnostico gerado ao final</span>
   </div>
   <button class="btn-start" id="btn-start">Comecar diagnostico</button>
@@ -151,7 +152,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:15px;color:va
 </div>
 
 <div id="result-screen">
-  <div>
+  <div class="result-header">
     <p class="result-eyebrow">Diagnostico Brio</p>
     <h2 class="result-title">O mapa da sua<br><em>vida agora.</em></h2>
     <p class="result-name-line" id="result-name-line"></p>
@@ -164,6 +165,10 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:15px;color:va
     <div><div class="stat-label">Media geral</div><div class="stat-val" id="stat-avg">-</div><div class="stat-note" id="stat-avg-note">-</div></div>
     <div><div class="stat-label">Pede atencao</div><div class="stat-val" id="stat-low">-</div><div class="stat-note" id="stat-low-note">-</div></div>
     <div><div class="stat-label">Maior alavanca</div><div class="stat-val" id="stat-lever">-</div><div class="stat-note" id="stat-lever-note">-</div></div>
+  </div>
+  <div class="dor-box" id="dor-box" style="display:none">
+    <div class="dor-label">Maior dor relatada</div>
+    <div id="dor-text"></div>
   </div>
   <div class="insight-box">
     <div class="insight-label">Sintese do diagnostico</div>
@@ -183,22 +188,7 @@ var diagnosisData = null;
 var isWaiting = false;
 var recognition = null;
 var isRecording = false;
-var STORAGE_KEY = 'brio_chat_v2';
-
-var AREAS = [
-  "Clareza e foco",
-  "Gestao do tempo e energia",
-  "Equilibrio emocional",
-  "Autoconhecimento",
-  "Relacao com dinheiro",
-  "Gestao e controle financeiro",
-  "Abundancia e expansao",
-  "Saude e disposicao",
-  "Desenvolvimento e aprendizado",
-  "Familia e vinculos proximos",
-  "Vida social e rede de apoio",
-  "Qualidade de vida"
-];
+var STORAGE_KEY = 'brio_chat_v3';
 
 function saveState() {
   try {
@@ -226,10 +216,58 @@ function loadState() {
 }
 
 function buildPrompt(name) {
-  return 'Voce e o assistente de diagnostico da Brio, consultoria de Arquitetura de Vida. Conduza uma conversa de diagnostico com '+name+' sobre 12 areas organizadas em 5 pilares.\n\nTOM: Curioso, levemente desafiador, humano. Direto, sem floreio. Frases curtas. Zero jargao de autoajuda. Usa o nome as vezes, nao sempre.\n\nOS 5 PILARES E 12 AREAS:\n\nPILAR 1 - MENTALIDADE E GESTAO DE SI (aprofundado):\n1. Clareza e foco\n2. Gestao do tempo e energia\n3. Equilibrio emocional\n4. Autoconhecimento\n\nPILAR 2 - COMPORTAMENTO FINANCEIRO (aprofundado):\n5. Relacao com dinheiro\n6. Gestao e controle financeiro\n7. Abundancia e expansao\n\nPILAR 3 - VIDA PESSOAL (enxuto):\n8. Saude e disposicao\n9. Desenvolvimento e aprendizado\n\nPILAR 4 - RELACIONAMENTOS (enxuto):\n10. Familia e vinculos proximos\n11. Vida social e rede de apoio\n\nPILAR 5 - QUALIDADE DE VIDA (enxuto):\n12. Qualidade de vida\n\nCOMO CONDUZIR:\n- Explore UMA area por vez, na ordem dos pilares.\n- Pilares 1 e 2 (aprofundados): faca 2-3 perguntas por area. Se a pessoa for vaga, faca UMA pergunta de ancoragem concreta antes de avancar. Ex: "Me da um exemplo de como isso aparece no seu dia a dia?" ou "O que seria diferente se isso estivesse resolvido?". Nao interrogue — aprofunde uma vez so. Ao fechar cada area, pergunte de forma natural: "Pensando em tudo que voce me contou sobre essa area... no dia a dia real, qual o nivel de satisfacao que voce tem — de 0 a 10, sendo 0 'precisa urgente de atencao' e 10 'estou muito bem aqui'?"\n- Pilares 3, 4 e 5 (enxutos): faca 1 pergunta por area. So aprofunde se a pessoa abrir algo significativo. Depois da resposta, emende naturalmente a pergunta de satisfacao: 'E de 0 a 10, qual o nivel de satisfacao com essa area hoje?'\n- AREA 5 (Relacao com dinheiro): preste atencao se o gap maior e em CRENCAS/EMOCOES (medo, culpa, bloqueios com dinheiro) ou em COMPORTAMENTOS PRATICOS (gastos, habitos, organizacao). Aprofunde no ponto onde o gap for maior.\n- AREA 10 (Familia): pergunte primeiro se a pessoa tem filhos. Se sim, explore parentalidade e familia de origem separadamente. Se nao, adapte para "familia que voce esta construindo ou escolheu construir".\n- Se a pessoa for vaga em qualquer area, faca uma pergunta de ancoragem antes de avancar. Ex: "Me da um exemplo concreto" ou "Como isso aparece no seu dia a dia?".\n- Mencione discretamente quando estiver mudando de pilar. Ex: "Agora vamos para um tema central da Brio..."\n- Ao completar as 12 areas, faca a PERGUNTA DE ENCERRAMENTO antes de gerar o diagnostico.\n\nPERGUNTA DE ENCERRAMENTO:\nAntes de gerar o diagnostico, pergunte: "Pensando em tudo que voce respondeu aqui — qual e o seu maior desafio hoje? A dor que voce mais quer resolver agora?" Registre a resposta como campo "dor_principal" no JSON.\n\nGERASAO DO DIAGNOSTICO:\nApos as 12 areas E a pergunta de encerramento, retorne APENAS JSON puro sem markdown:\n\n{"areas":[{"nome":"Clareza e foco","nota":6,"nota_cliente":7,"diagnostico":"texto","proximo":"texto"}],"insight":"sintese poderosa em 2 frases","alavanca":"area","alavanca_razao":"razao","dor_principal":"o que o cliente disse ser sua maior dor"}\n\nCRITICO: so o JSON puro, sem texto antes ou depois, sem backticks.';
+  var p = '';
+  p += 'Voce e o assistente de diagnostico da Brio, consultoria de Arquitetura de Vida. ';
+  p += 'Conduza uma conversa de diagnostico com ' + name + ' sobre 12 areas organizadas em 5 pilares.\n\n';
+  p += 'TOM: Curioso, levemente desafiador, humano. Direto, sem floreio. Frases curtas. Zero jargao. Usa o nome as vezes.\n\n';
+  p += 'OS 5 PILARES E 12 AREAS:\n\n';
+  p += 'PILAR 1 - MENTALIDADE E GESTAO DE SI (aprofundado):\n';
+  p += '1. Clareza e foco\n2. Gestao do tempo e energia\n3. Equilibrio emocional\n4. Autoconhecimento\n\n';
+  p += 'PILAR 2 - COMPORTAMENTO FINANCEIRO (aprofundado):\n';
+  p += '5. Relacao com dinheiro\n6. Gestao e controle financeiro\n7. Abundancia e expansao\n\n';
+  p += 'PILAR 3 - VIDA PESSOAL (enxuto):\n';
+  p += '8. Saude e disposicao\n9. Desenvolvimento e aprendizado\n\n';
+  p += 'PILAR 4 - RELACIONAMENTOS (enxuto):\n';
+  p += '10. Familia e vinculos proximos\n11. Vida social e rede de apoio\n\n';
+  p += 'PILAR 5 - QUALIDADE DE VIDA (enxuto):\n';
+  p += '12. Qualidade de vida\n\n';
+  p += 'COMO CONDUZIR:\n';
+  p += '- Explore UMA area por vez, na ordem dos pilares.\n';
+  p += '- PILARES 1 e 2: faca 2-3 perguntas por area. Se vago, faca UMA pergunta de ancoragem: Me da um exemplo concreto? ou O que mudaria se isso estivesse resolvido? Ao fechar cada area, pergunte: De 0 a 10, qual o nivel de satisfacao com essa area hoje, sendo 0 = precisa urgente de atencao e 10 = estou muito bem aqui?\n';
+  p += '- PILARES 3, 4 e 5: faca 1 pergunta por area. Emende: E de 0 a 10, qual o nivel de satisfacao?\n';
+  p += '- AREA 5 - Relacao com dinheiro: identifique se o gap maior e em crencas e emocoes (medo, culpa, bloqueios) ou em comportamentos praticos (gastos, habitos). Aprofunde no gap maior.\n';
+  p += '- AREA 10 - Familia: pergunte primeiro se tem filhos. Se sim, explore parentalidade e familia de origem. Se nao, adapte para a familia que escolheu construir.\n';
+  p += '- Mencione discretamente a mudanca de pilar.\n';
+  p += '- Ao completar as 12 areas, faca a pergunta de encerramento.\n\n';
+  p += 'PERGUNTA DE ENCERRAMENTO:\n';
+  p += 'Pensando em tudo que voce respondeu, qual e o seu maior desafio hoje? A dor que voce mais quer resolver agora?\n\n';
+  p += 'GERACAO DO DIAGNOSTICO:\n';
+  p += 'Apos as 12 areas E a pergunta de encerramento, retorne APENAS JSON puro sem markdown:\n';
+  p += '{"areas":[{"nome":"Clareza e foco","nota":6,"nota_cliente":7,"diagnostico":"texto","proximo":"texto"}],"insight":"sintese em 2 frases","alavanca":"area","alavanca_razao":"razao","dor_principal":"maior dor relatada"}\n\n';
+  p += 'CRITICO: so o JSON puro, sem texto antes ou depois, sem backticks.';
+  return p;
+}
+
+function emailjs_init() {
+  try { emailjs.init('rvvPCjCaI5FpWYujk'); } catch(e) {}
+}
+
+function enviarEmail(dados) {
+  try {
+    var linhas = dados.areas.map(function(a, i) {
+      var nc = a.nota_cliente !== undefined ? ' | voce: ' + a.nota_cliente : '';
+      return (i+1) + '. ' + a.nome + ' - nota IA: ' + a.nota + nc + '\n   ' + a.diagnostico + '\n   Proximo: ' + a.proximo;
+    });
+    var texto = 'DIAGNOSTICO BRIO\n\nCliente: ' + dados.nome + '\nMedia geral: ' + dados.media + '\n\n' + linhas.join('\n\n') + '\n\nSINTESE: ' + dados.insight + '\n\nMAIOR ALAVANCA: ' + dados.alavanca + ' - ' + dados.alavanca_razao + '\n\nMAIOR DOR: ' + dados.dor_principal;
+    emailjs.send('service_6vk2tnm', 'template_3pz49pu', {
+      cliente_nome: dados.nome,
+      diagnostico: texto
+    });
+  } catch(e) { console.error('Erro email:', e); }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  emailjs_init();
   document.getElementById('btn-start').addEventListener('click', goToName);
   document.getElementById('btn-go').addEventListener('click', startChat);
   document.getElementById('name-input').addEventListener('keydown', function(e){ if(e.key==='Enter') startChat(); });
@@ -291,11 +329,19 @@ function addMessage(role, text) {
   var div = document.createElement('div');
   div.className = 'msg ' + role;
   var initial = userName ? userName.charAt(0).toUpperCase() : 'V';
-  var safe = text.replace(/\n/g,'<br>');
+  var safe = text.replace(/\n/g, '<br>');
   if (role === 'bot') {
-    div.innerHTML = '<div class="msg-avatar">b</div><div class="msg-bubble">'+safe+'</div>';
+    div.innerHTML = '<div class="msg-avatar">b</div><div class="msg-bubble">' + safe + '</div>';
   } else {
-    div.innerHTML = '<div class="msg-bubble">'+safe+'</div><div class="msg-avatar" style="background:#1c1917;color:#f5f2ed;font-family:Inter,sans-serif;font-size:12px;font-style:normal;">'+initial+'</div>';
+    var av = document.createElement('div');
+    av.className = 'msg-avatar';
+    av.style.cssText = 'background:#1c1917;color:#f5f2ed;font-family:Inter,sans-serif;font-size:12px;font-style:normal;';
+    av.textContent = initial;
+    var bub = document.createElement('div');
+    bub.className = 'msg-bubble';
+    bub.innerHTML = safe;
+    div.appendChild(bub);
+    div.appendChild(av);
   }
   msgs.insertBefore(div, document.getElementById('typing'));
   scrollBottom();
@@ -303,9 +349,9 @@ function addMessage(role, text) {
 
 async function sendFirstMessage() {
   showTyping();
-  var reply = await callClaude([{role:'user',content:'Ola, meu nome e '+userName+'. Pode comecar o diagnostico.'}]);
+  var reply = await callClaude([{role:'user', content:'Ola, meu nome e ' + userName + '. Pode comecar o diagnostico.'}]);
   hideTyping();
-  if (reply) { addMessage('bot', reply); conversationHistory.push({role:'assistant',content:reply}); saveState(); }
+  if (reply) { addMessage('bot', reply); conversationHistory.push({role:'assistant', content:reply}); saveState(); }
 }
 
 async function sendMessage() {
@@ -315,7 +361,7 @@ async function sendMessage() {
   if (!text) return;
   input.value = ''; input.style.height = 'auto';
   addMessage('user', text);
-  conversationHistory.push({role:'user',content:text});
+  conversationHistory.push({role:'user', content:text});
   saveState();
   isWaiting = true; showTyping(); updateProgress();
   var reply = await callClaude(conversationHistory);
@@ -326,27 +372,27 @@ async function sendMessage() {
   if (match) {
     try {
       diagnosisData = JSON.parse(match[0]);
-      addMessage('bot','Pronto. Seu diagnostico esta gerado.');
-      conversationHistory.push({role:'assistant',content:reply});
+      addMessage('bot', 'Pronto. Seu diagnostico esta gerado.');
+      conversationHistory.push({role:'assistant', content:reply});
       localStorage.removeItem(STORAGE_KEY);
-      var _notas=diagnosisData.areas.map(function(a){return a.nota;});
-      var _avg=(_notas.reduce(function(s,n){return s+n;},0)/_notas.length).toFixed(1);
-      enviarEmail({nome:userName,media:_avg,areas:diagnosisData.areas,insight:diagnosisData.insight,alavanca:diagnosisData.alavanca,alavanca_razao:diagnosisData.alavanca_razao});
+      var notas = diagnosisData.areas.map(function(a){ return a.nota; });
+      var avg = (notas.reduce(function(s,n){ return s+n; }, 0) / notas.length).toFixed(1);
+      enviarEmail({nome:userName, media:avg, areas:diagnosisData.areas, insight:diagnosisData.insight, alavanca:diagnosisData.alavanca, alavanca_razao:diagnosisData.alavanca_razao, dor_principal:diagnosisData.dor_principal || ''});
       setTimeout(showResult, 1400);
       return;
     } catch(e) { console.error(e); }
   }
   addMessage('bot', reply);
-  conversationHistory.push({role:'assistant',content:reply});
+  conversationHistory.push({role:'assistant', content:reply});
   saveState();
 }
 
 async function callClaude(messages) {
   try {
-    var res = await fetch('https://brio-proxy.rabello-medeiros.workers.dev',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200,system:buildPrompt(userName),messages:messages})
+    var res = await fetch('https://brio-proxy.rabello-medeiros.workers.dev', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({model:'claude-sonnet-4-6', max_tokens:1200, system:buildPrompt(userName), messages:messages})
     });
     var data = await res.json();
     if (data.content && data.content[0]) return data.content[0].text;
@@ -356,8 +402,8 @@ async function callClaude(messages) {
 
 function updateProgress() {
   var total = conversationHistory.length;
-  document.getElementById('progress-fill').style.width = Math.min(Math.round((total/22)*100),95)+'%';
-  document.getElementById('progress-label').textContent = 'Area '+Math.min(Math.ceil(total/2.4),12)+' de 12';
+  document.getElementById('progress-fill').style.width = Math.min(Math.round((total/26)*100), 95) + '%';
+  document.getElementById('progress-label').textContent = 'Area ' + Math.min(Math.ceil(total/2.6), 12) + ' de 12';
 }
 
 function toggleMic() {
@@ -369,74 +415,126 @@ function toggleMic() {
   recognition.continuous = true;
   recognition.interimResults = true;
   recognition.onstart = function(){ isRecording=true; document.getElementById('mic-btn').classList.add('recording'); document.getElementById('chat-input').placeholder='Ouvindo... clique no microfone para parar'; };
-  recognition.onresult = function(e){ var t=''; for(var i=0;i<e.results.length;i++){if(e.results[i].isFinal){t+=e.results[i][0].transcript+' ';}} var inp=document.getElementById('chat-input'); if(t.trim()) inp.value=t.trim(); autoResize(inp); };
+  recognition.onresult = function(e){
+    var final = '';
+    for (var i=0; i<e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript + ' ';
+    }
+    var inp = document.getElementById('chat-input');
+    if (final.trim()) { inp.value = final.trim(); autoResize(inp); }
+  };
   recognition.onend = function(){ isRecording=false; document.getElementById('mic-btn').classList.remove('recording'); document.getElementById('chat-input').placeholder='Escreva ou fale...'; };
   recognition.onerror = function(){ isRecording=false; document.getElementById('mic-btn').classList.remove('recording'); };
   recognition.start();
-}
-
-function enviarEmail(dados) {
-  try {
-    var areas = dados.areas.map(function(a,i){ return (i+1)+". "+a.nome+" ("+a.nota+"/10)\n   Diagnostico: "+a.diagnostico+"\n   Proximo passo: "+a.proximo; }).join("\n\n");
-    var texto = "DIAGNOSTICO BRIO\n\nCliente: "+dados.nome+"\nMedia geral: "+dados.media+"\n\n"+areas+"\n\nSINTESE: "+dados.insight+"\n\nMAIOR ALAVANCA: "+dados.alavanca+" - "+dados.alavanca_razao;
-    emailjs.send("service_6vk2tnm", "template_3pz49pu", {
-      cliente_nome: dados.nome,
-      diagnostico: texto
-    });
-  } catch(e) { console.error("Erro ao enviar email:", e); }
 }
 
 function showResult() {
   document.getElementById('chat-screen').style.display = 'none';
   document.getElementById('result-screen').style.display = 'flex';
   if (!diagnosisData) return;
-  var areas=diagnosisData.areas, insight=diagnosisData.insight, al=diagnosisData.alavanca, alr=diagnosisData.alavanca_razao;
-  var now=new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
-  document.getElementById('result-name-line').textContent='Diagnostico de '+userName+' - '+now;
+  var areas = diagnosisData.areas;
+  var insight = diagnosisData.insight;
+  var alavanca = diagnosisData.alavanca;
+  var alavanca_razao = diagnosisData.alavanca_razao;
+  var dor = diagnosisData.dor_principal;
+  var now = new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  document.getElementById('result-name-line').textContent = 'Diagnostico de ' + userName + ' - ' + now;
   drawWheel(areas);
-  var c=document.getElementById('result-areas'); c.innerHTML='';
-  areas.forEach(function(a,i){
-    var card=document.createElement('div'); card.className='r-card';
-    var gapHtml = '';
+  var container = document.getElementById('result-areas');
+  container.innerHTML = '';
+  areas.forEach(function(a, i) {
+    var card = document.createElement('div');
+    card.className = 'r-card';
+    var top = document.createElement('div');
+    top.className = 'r-card-top';
+    var num = document.createElement('span'); num.className = 'r-num'; num.textContent = i+1;
+    var nome = document.createElement('span'); nome.className = 'r-name'; nome.textContent = a.nome;
+    var score = document.createElement('span'); score.className = 'r-score'; score.textContent = a.nota;
+    top.appendChild(num); top.appendChild(nome); top.appendChild(score);
     if (a.nota_cliente !== undefined) {
+      var nc = document.createElement('small');
+      nc.style.cssText = 'font-size:11px;color:#78716c;display:block;margin-top:2px;';
       var gap = a.nota_cliente - a.nota;
-      var gapColor = gap > 2 ? '#A32D2D' : gap < -2 ? '#27500A' : '#78716c';
-      var gapText = gap > 0 ? '+'+gap+' vs IA' : gap < 0 ? gap+' vs IA' : 'igual a IA';
-      gapHtml = '<span style="font-size:10px;color:'+gapColor+';font-weight:500;margin-left:6px;">voce: '+a.nota_cliente+' ('+gapText+')</span>';
+      var gapStr = gap > 0 ? '(+' + gap + ' vs IA)' : gap < 0 ? '(' + gap + ' vs IA)' : '(igual a IA)';
+      nc.textContent = 'Voce: ' + a.nota_cliente + ' ' + gapStr;
+      top.appendChild(nc);
     }
-    card.innerHTML='<div class="r-card-top"><span class="r-num">'+(i+1)+'</span><span class="r-name">'+a.nome+'</span><span class="r-score">'+a.nota+'</span></div>'+gapHtml+'<div class="r-bar-bg"><div class="r-bar-fill" style="width:'+(a.nota*10)+'%"></div></div><div class="r-detail"><strong style="color:#1c1917;font-weight:500">Diagnostico:</strong> '+a.diagnostico+'<br><br><strong style="color:#1c1917;font-weight:500">Proximo passo:</strong> '+a.proximo+'</div>';
-    card.addEventListener('click',function(){ card.classList.toggle('open'); });
-    c.appendChild(card);
+    var barBg = document.createElement('div'); barBg.className = 'r-bar-bg';
+    var barFill = document.createElement('div'); barFill.className = 'r-bar-fill'; barFill.style.width = (a.nota*10) + '%';
+    barBg.appendChild(barFill);
+    var detail = document.createElement('div'); detail.className = 'r-detail';
+    detail.innerHTML = '<strong style="color:#1c1917;font-weight:500">Diagnostico:</strong> ' + a.diagnostico + '<br><br><strong style="color:#1c1917;font-weight:500">Proximo passo:</strong> ' + a.proximo;
+    card.appendChild(top); card.appendChild(barBg); card.appendChild(detail);
+    card.addEventListener('click', function(){ card.classList.toggle('open'); });
+    container.appendChild(card);
   });
-  var notas=areas.map(function(a){return a.nota;}), avg=(notas.reduce(function(s,n){return s+n;},0)/notas.length).toFixed(1), mn=Math.min.apply(null,notas), ma=areas.find(function(a){return a.nota===mn;});
-  document.getElementById('stat-avg').textContent=avg;
-  document.getElementById('stat-avg-note').textContent=avg<5?'Modo sobreviver ativo':avg<7?'Equilibrio em construcao':'Base solida';
-  document.getElementById('stat-low').textContent=mn;
-  document.getElementById('stat-low-note').textContent=ma.nome;
-  document.getElementById('stat-lever').textContent='';
-  document.getElementById('stat-lever-note').textContent=al+' - '+alr;
-  document.getElementById('insight-text').textContent=insight;
+  var notas = areas.map(function(a){ return a.nota; });
+  var avg = (notas.reduce(function(s,n){ return s+n; },0)/notas.length).toFixed(1);
+  var minNota = Math.min.apply(null, notas);
+  var minArea = areas.find(function(a){ return a.nota===minNota; });
+  document.getElementById('stat-avg').textContent = avg;
+  document.getElementById('stat-avg-note').textContent = avg < 5 ? 'Modo sobreviver ativo' : avg < 7 ? 'Equilibrio em construcao' : 'Base solida';
+  document.getElementById('stat-low').textContent = minNota;
+  document.getElementById('stat-low-note').textContent = minArea.nome;
+  document.getElementById('stat-lever').textContent = 'up';
+  document.getElementById('stat-lever-note').textContent = alavanca + ' - ' + alavanca_razao;
+  document.getElementById('insight-text').textContent = insight;
+  if (dor) {
+    document.getElementById('dor-box').style.display = 'block';
+    document.getElementById('dor-text').textContent = dor;
+  }
 }
 
 function drawWheel(areas) {
-  var svg=document.getElementById('result-svg'); svg.innerHTML='';
-  var cx=160,cy=160,R=130,step=(2*Math.PI)/areas.length,start=-Math.PI/2;
-  [2,4,6,8,10].forEach(function(v){ var c=document.createElementNS('http://www.w3.org/2000/svg','circle'); c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r',(v/10)*R);c.setAttribute('fill','none');c.setAttribute('stroke','#e8e3dc');c.setAttribute('stroke-width','1');svg.appendChild(c); });
-  areas.forEach(function(_,i){ var a=start+i*step,l=document.createElementNS('http://www.w3.org/2000/svg','line'); l.setAttribute('x1',cx);l.setAttribute('y1',cy);l.setAttribute('x2',cx+R*Math.cos(a));l.setAttribute('y2',cy+R*Math.sin(a));l.setAttribute('stroke','#e8e3dc');l.setAttribute('stroke-width','1');svg.appendChild(l); });
-  var pts=areas.map(function(a,i){var ang=start+i*step,d=(a.nota/10)*R;return (cx+d*Math.cos(ang))+','+(cy+d*Math.sin(ang));}).join(' ');
-  var poly=document.createElementNS('http://www.w3.org/2000/svg','polygon'); poly.setAttribute('points',pts);poly.setAttribute('fill','rgba(168,82,42,0.15)');poly.setAttribute('stroke','#a8522a');poly.setAttribute('stroke-width','2');poly.setAttribute('stroke-linejoin','round');svg.appendChild(poly);
-  areas.forEach(function(a,i){ var ang=start+i*step,d=(a.nota/10)*R,x=cx+d*Math.cos(ang),y=cy+d*Math.sin(ang),dot=document.createElementNS('http://www.w3.org/2000/svg','circle'); dot.setAttribute('cx',x);dot.setAttribute('cy',y);dot.setAttribute('r','5');dot.setAttribute('fill','#a8522a');dot.setAttribute('stroke','white');dot.setAttribute('stroke-width','2');svg.appendChild(dot); var lr=R+16,t=document.createElementNS('http://www.w3.org/2000/svg','text'); t.setAttribute('x',cx+lr*Math.cos(ang));t.setAttribute('y',cy+lr*Math.sin(ang));t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','middle');t.setAttribute('font-size','9');t.setAttribute('font-family','Inter,sans-serif');t.setAttribute('fill','#78716c');t.textContent=i+1;svg.appendChild(t); });
+  var svg = document.getElementById('result-svg');
+  svg.innerHTML = '';
+  var cx=160, cy=160, R=130, N=areas.length, step=(2*Math.PI)/N, start=-Math.PI/2;
+  [2,4,6,8,10].forEach(function(v){
+    var c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',cx); c.setAttribute('cy',cy); c.setAttribute('r',(v/10)*R);
+    c.setAttribute('fill','none'); c.setAttribute('stroke','#e8e3dc'); c.setAttribute('stroke-width','1');
+    svg.appendChild(c);
+  });
+  areas.forEach(function(_,i){
+    var a=start+i*step, l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',cx); l.setAttribute('y1',cy);
+    l.setAttribute('x2',cx+R*Math.cos(a)); l.setAttribute('y2',cy+R*Math.sin(a));
+    l.setAttribute('stroke','#e8e3dc'); l.setAttribute('stroke-width','1');
+    svg.appendChild(l);
+  });
+  var pts = areas.map(function(a,i){
+    var ang=start+i*step, d=(a.nota/10)*R;
+    return (cx+d*Math.cos(ang)) + ',' + (cy+d*Math.sin(ang));
+  }).join(' ');
+  var poly=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  poly.setAttribute('points',pts); poly.setAttribute('fill','rgba(168,82,42,0.15)');
+  poly.setAttribute('stroke','#a8522a'); poly.setAttribute('stroke-width','2'); poly.setAttribute('stroke-linejoin','round');
+  svg.appendChild(poly);
+  areas.forEach(function(a,i){
+    var ang=start+i*step, d=(a.nota/10)*R, x=cx+d*Math.cos(ang), y=cy+d*Math.sin(ang);
+    var dot=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('cx',x); dot.setAttribute('cy',y); dot.setAttribute('r','5');
+    dot.setAttribute('fill','#a8522a'); dot.setAttribute('stroke','white'); dot.setAttribute('stroke-width','2');
+    svg.appendChild(dot);
+    var lr=R+16, t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',cx+lr*Math.cos(ang)); t.setAttribute('y',cy+lr*Math.sin(ang));
+    t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','middle');
+    t.setAttribute('font-size','9'); t.setAttribute('font-family','Inter,sans-serif'); t.setAttribute('fill','#78716c');
+    t.textContent = i+1; svg.appendChild(t);
+  });
 }
 
 function downloadPDF() {
   if (!diagnosisData) return;
-  var areas=diagnosisData.areas,insight=diagnosisData.insight,al=diagnosisData.alavanca,alr=diagnosisData.alavanca_razao;
-  var notas=areas.map(function(a){return a.nota;}),avg=(notas.reduce(function(s,n){return s+n;},0)/notas.length).toFixed(1);
+  var areas=diagnosisData.areas, insight=diagnosisData.insight, al=diagnosisData.alavanca, alr=diagnosisData.alavanca_razao, dor=diagnosisData.dor_principal||'';
+  var notas=areas.map(function(a){return a.nota;}), avg=(notas.reduce(function(s,n){return s+n;},0)/notas.length).toFixed(1);
   var now=new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
-  var ah=areas.map(function(a,i){return '<div class="area"><div class="ah"><span class="an">'+(i+1)+'. '+a.nome+'</span><span class="as">'+a.nota+'/10</span></div><div class="lbl">Diagnostico</div><div>'+a.diagnostico+'</div><div class="lbl">Proximo passo</div><div>'+a.proximo+'</div></div>';}).join('');
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Georgia,serif;max-width:700px;margin:40px auto;color:#1c1917;line-height:1.6}h1{font-size:28px;font-weight:400;color:#a8522a}h2{font-size:16px;font-weight:400;color:#78716c;margin-bottom:32px}.area{margin-bottom:20px;padding:16px;border:1px solid #e8e3dc;border-radius:8px}.ah{display:flex;justify-content:space-between}.an{font-weight:600;font-size:14px}.as{color:#a8522a;font-size:18px}.lbl{font-size:11px;text-transform:uppercase;color:#78716c;margin:10px 0 4px}.insight{background:#1c1917;color:#f5f2ed;padding:24px;border-radius:8px;font-style:italic;font-size:18px;margin:32px 0}.ft{font-size:11px;color:#78716c;margin-top:32px;border-top:1px solid #e8e3dc;padding-top:16px}</style>
-</head><body><h1>Diagnostico de Vida - Brio</h1><h2>'+userName+' - '+now+' - Media: '+avg+'</h2>'+ah+'<div class="insight">'+insight+'</div><div><strong>Alavanca:</strong> '+al+' - '+alr+'</div><div class="ft">Brio - Arquitetura de Vida</div></body></html>';
-  var blob=new Blob([html],{type:'text/html'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  var ah=areas.map(function(a,i){
+    var nc = a.nota_cliente !== undefined ? ' | Voce: ' + a.nota_cliente : '';
+    return '<div class="area"><div class="ah"><span class="an">'+(i+1)+'. '+a.nome+'</span><span class="as">IA: '+a.nota+'/10'+nc+'</span></div><div class="lbl">Diagnostico</div><div>'+a.diagnostico+'</div><div class="lbl">Proximo passo</div><div>'+a.proximo+'</div></div>';
+  }).join('');
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Georgia,serif;max-width:700px;margin:40px auto;color:#1c1917;line-height:1.6}h1{font-size:28px;font-weight:400;color:#a8522a}h2{font-size:16px;font-weight:400;color:#78716c;margin-bottom:32px}.area{margin-bottom:20px;padding:16px;border:1px solid #e8e3dc;border-radius:8px}.ah{display:flex;justify-content:space-between}.an{font-weight:600;font-size:14px}.as{color:#a8522a;font-size:14px}.lbl{font-size:11px;text-transform:uppercase;color:#78716c;margin:10px 0 4px}.insight{background:#1c1917;color:#f5f2ed;padding:24px;border-radius:8px;font-style:italic;font-size:18px;margin:32px 0}.dor{background:#fdf8f6;border-left:3px solid #a8522a;padding:16px;margin:20px 0}.ft{font-size:11px;color:#78716c;margin-top:32px;border-top:1px solid #e8e3dc;padding-top:16px}</style></head><body><h1>Diagnostico de Vida - Brio</h1><h2>'+userName+' - '+now+' - Media: '+avg+'</h2>'+ah+'<div class="insight">'+insight+'</div>'+(dor?'<div class="dor"><strong>Maior dor relatada:</strong> '+dor+'</div>':'')+'<div><strong>Maior alavanca:</strong> '+al+' - '+alr+'</div><div class="ft">Brio - Arquitetura de Vida</div></body></html>';
+  var blob=new Blob([html],{type:'text/html'}), url=URL.createObjectURL(blob), a=document.createElement('a');
   a.href=url; a.download='brio-'+userName.toLowerCase()+'.html'; a.click(); URL.revokeObjectURL(url);
 }
 </script>
